@@ -1,4 +1,5 @@
 import { Routes, Route, Link } from 'react-router-dom'
+import { siteConfig } from './config/site.js'
 import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
 import Services from './pages/Services.jsx'
@@ -12,14 +13,21 @@ function App() {
   return (
     <div>
       {/* Temporary nav: Day 5 mein real Navbar se replace hoga */}
-      <nav className="flex flex-wrap gap-4 border-b border-gray-200 p-4 text-sm">
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/services">Services</Link>
-        <Link to="/portfolio">Portfolio</Link>
-        <Link to="/start-project">Start a Project</Link>
-        <Link to="/contact">Contact</Link>
-        <Link to="/privacy-policy">Privacy Policy</Link>
+      <nav className="flex flex-wrap items-center gap-4 border-b border-line p-4 text-sm">
+        <Link to="/" className="font-semibold text-accent-600">
+          {siteConfig.brandName}
+        </Link>
+        {siteConfig.navLinks.map((link) => (
+          <Link key={link.path} to={link.path}>
+            {link.label}
+          </Link>
+        ))}
+        <Link to={siteConfig.cta.path}>{siteConfig.cta.label}</Link>
+        {siteConfig.footerLinks.map((link) => (
+          <Link key={link.path} to={link.path}>
+            {link.label}
+          </Link>
+        ))}
       </nav>
 
       <main className="p-6">
