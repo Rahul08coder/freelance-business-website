@@ -2,7 +2,7 @@
 // Kuch badalna ho (brand name, email, links), toh sirf yeh file edit karo.
 
 export const siteConfig = {
-  brandName: 'DevLence',
+  brandName: 'DevLance',
   tagline: 'Websites and web apps built for your business',
   description:
     'Freelance web developer building business websites, landing pages and MERN stack applications.',
@@ -18,7 +18,7 @@ export const siteConfig = {
     twitter: '',
   },
 
-  // Header navigation. Privacy Policy Footer mein jayegi (Day 5)
+  // Header navigation. Privacy Policy Footer mein hai
   navLinks: [
     { label: 'Home', path: '/' },
     { label: 'About', path: '/about' },
@@ -31,11 +31,35 @@ export const siteConfig = {
   cta: { label: 'Start a Project', path: '/start-project' },
 
   footerLinks: [{ label: 'Privacy Policy', path: '/privacy-policy' }],
+
+  // Home page hero section
+  hero: {
+    badge: 'Your development partner',
+    headline: 'Ideas to Websites.',
+    headlineAccent: 'Problems to Solutions.',
+    text: "I build modern websites, web applications and fix technical problems. Let's turn your ideas into real, working products.",
+    chips: [
+      { label: 'Web Development', icon: 'Globe' },
+      { label: 'MERN Stack', icon: 'Layers' },
+      { label: 'Bug Fixing', icon: 'Bug' },
+      { label: 'API Integration', icon: 'Plug' },
+    ],
+    secondaryCta: { label: 'View My Work', path: '/portfolio' },
+  },
+
+  // Hero ke neeche ki strip. Yeh promises hain, statistics nahi.
+  // Jab tak tumhare paas real numbers na ho, fake stats mat daalna.
+  highlights: [
+    { title: 'Clear Communication', text: 'Quick and honest replies', icon: 'MessageSquare' },
+    { title: 'Clean Code', text: 'Modern and maintainable', icon: 'Code' },
+    { title: 'Realistic Timelines', text: 'Your time matters', icon: 'Clock' },
+    { title: 'Long-term Support', text: 'Help after delivery', icon: 'LifeBuoy' },
+  ],
 };
 
 // Services list.
 // enabled: false kar do un services ke liye jo tum abhi deliver nahi kar sakte.
-// Sirf enabled: true wali services website par dikhengi (Day 6 se).
+// Sirf enabled: true wali services website par dikhti hain.
 // Price abhi jaanbujhkar nahi diya hai. Jab tum decide karo tab add karenge.
 export const services = [
   {
