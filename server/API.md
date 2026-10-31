@@ -27,12 +27,13 @@ Error:
 | 404 | Not found |
 | 429 | Too many requests (rate limit) |
 | 500 | Server error |
+| 503 | Service unavailable (for example, database not connected) |
 
 ## Public endpoints
 
 | Method | URL | Purpose | Auth | Planned day | Status |
 |---|---|---|---|---|---|
-| GET | /api/health | Check that the server is running | None | 12 | Implemented |
+| GET | /api/health | Check that the server and database are running | None | 12, 13 | Implemented |
 | GET | /api/services | List active services | None | 16 | Planned |
 | GET | /api/projects | List projects (optional `?featured=true`) | None | 16 | Planned |
 | GET | /api/projects/:slug | Get one project | None | 16 | Planned |
@@ -63,7 +64,7 @@ Site settings endpoints are optional and will be decided on Day 22.
 
 ### GET /api/health
 
-- Purpose: confirm the server is up.
+- Purpose: confirm the server is up and connected to the database.
 - Auth: none.
 - Request body: none.
 - Success response (200):
@@ -72,12 +73,15 @@ Site settings endpoints are optional and will be decided on Day 22.
         "success": true,
         "data": {
           "status": "ok",
+          "database": "connected",
           "uptimeSeconds": 42,
           "timestamp": "2026-10-31T12:00:00.000Z"
         }
       }
 
-- Possible errors: none expected.
+- Error response (503), when the database is not connected:
+
+      { "success": false, "error": { "message": "Database is not connected." } }
 
 ### Any unknown route
 
