@@ -1,3 +1,4 @@
+import { usePageTitle } from '../hooks/usePageTitle.js'
 import Hero from '../components/home/Hero.jsx'
 import ServicesOverview from '../components/home/ServicesOverview.jsx'
 import FeaturedProjects from '../components/home/FeaturedProjects.jsx'
@@ -7,6 +8,8 @@ import FAQSection from '../components/home/FAQSection.jsx'
 import CtaBanner from '../components/home/CtaBanner.jsx'
 
 function Home() {
+  usePageTitle()
+
   return (
     <>
       <Hero />
