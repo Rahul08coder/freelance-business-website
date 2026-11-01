@@ -1,6 +1,7 @@
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import { env } from './config/env.js'
 import { corsOptions } from './config/cors.js'
 import routes from './routes/index.js'
@@ -26,8 +27,10 @@ app.use(requestLogger)
 app.use(cors(corsOptions))
 
 // JSON body padhne ke liye. 20kb se bada body reject hoga.
-// (Hindi jaise scripts mein ek character 3 bytes ka hota hai, isliye 10kb kam pad sakta tha.)
 app.use(express.json({ limit: '20kb' }))
+
+// Cookies padhne ke liye (admin session ke liye)
+app.use(cookieParser())
 
 // Saare API routes /api se shuru honge
 app.use('/api', routes)

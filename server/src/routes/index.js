@@ -3,6 +3,7 @@ import healthRoutes from './healthRoutes.js'
 import serviceRoutes from './serviceRoutes.js'
 import projectRoutes from './projectRoutes.js'
 import inquiryRoutes from './inquiryRoutes.js'
+import adminRoutes from './adminRoutes.js'
 import { apiLimiter } from '../middleware/rateLimiters.js'
 
 const router = Router()
@@ -18,6 +19,7 @@ router.use('/services', serviceRoutes)
 router.use('/projects', projectRoutes)
 router.use('/inquiries', inquiryRoutes)
 
-// Admin routes (Day 18 se) yahin niche jodte jayenge.
+// Admin routes (login ke baad)
+router.use('/admin', adminRoutes)
 
 export default router

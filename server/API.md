@@ -52,9 +52,9 @@ There is no public endpoint to read inquiries. Inquiries are private and are onl
 
 | Method | URL | Purpose | Planned day | Status |
 |---|---|---|---|---|
-| POST | /api/admin/login | Log in (sets HTTP-only cookie, rate limited) | 18 | Planned |
-| POST | /api/admin/logout | Log out | 18 | Planned |
-| GET | /api/admin/me | Get the logged-in admin | 18 | Planned |
+| POST | /api/admin/login | Log in (sets HTTP-only cookie, rate limited) | 18 | Implemented |
+| POST | /api/admin/logout | Log out | 18 | Implemented |
+| GET | /api/admin/me | Get the logged-in admin | 18 | Implemented |
 | GET | /api/admin/dashboard | Dashboard summary counts | 20 | Planned |
 | GET | /api/admin/inquiries | List inquiries (search, status filter, pages) | 20 | Planned |
 | GET | /api/admin/inquiries/:id | Get one inquiry | 20 | Planned |
@@ -68,6 +68,8 @@ There is no public endpoint to read inquiries. Inquiries are private and are onl
 | DELETE | /api/admin/services/:id | Delete a service | 22 | Planned |
 
 Site settings endpoints are optional and will be decided on Day 22.
+
+Details for implemented admin endpoints: see API-ADMIN.md.
 
 ## Implemented endpoint details
 
