@@ -25,8 +25,9 @@ app.use(requestLogger)
 // Sirf allowed websites browser se API call kar sakti hain
 app.use(cors(corsOptions))
 
-// JSON body padhne ke liye. 10kb se bada body reject hoga (inquiry form isse bahut chhota hai)
-app.use(express.json({ limit: '10kb' }))
+// JSON body padhne ke liye. 20kb se bada body reject hoga.
+// (Hindi jaise scripts mein ek character 3 bytes ka hota hai, isliye 10kb kam pad sakta tha.)
+app.use(express.json({ limit: '20kb' }))
 
 // Saare API routes /api se shuru honge
 app.use('/api', routes)

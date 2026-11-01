@@ -9,15 +9,16 @@ const API_URL = (
 const REQUEST_TIMEOUT_MS = 30000
 
 export class ApiError extends Error {
-  constructor(message, status = 0) {
+  // details: server ke validation errors ki list, jaise [{ field: 'email', message: '...' }]
+  constructor(message, status = 0, details = null) {
     super(message)
     this.name = 'ApiError'
     this.status = status
+    this.details = details
   }
 }
 
-// GET request. Success par server ka "data" wapas deta hai, galti par ApiError throw karta hai.
-export async function apiGet(path, { signal } = {}) {
+async function request(path, { method = 'GET', body, signal } = {}) {
   if (!API_URL) {
     throw new ApiError('The API address is not configured.')
   }
@@ -25,12 +26,18 @@ export async function apiGet(path, { signal } = {}) {
   const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS)
   const combinedSignal = signal ? AbortSignal.any([signal, timeout]) : timeout
 
+  const headers = { Accept: 'application/json' }
+  if (body !== undefined) {
+    headers['Content-Type'] = 'application/json'
+  }
+
   let response
   try {
     response = await fetch(`${API_URL}${path}`, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
+      method,
+      headers,
       credentials: 'include', // admin cookie ke liye (Day 18)
+      body: body !== undefined ? JSON.stringify(body) : undefined,
       signal: combinedSignal,
     })
   } catch (error) {
@@ -42,16 +49,30 @@ export async function apiGet(path, { signal } = {}) {
     throw new ApiError('Could not reach the server. Please check your connection and try again.')
   }
 
-  let body = null
+  let payload = null
   try {
-    body = await response.json()
+    payload = await response.json()
   } catch {
     // JSON nahi aaya
   }
 
-  if (!response.ok || !body?.success) {
-    throw new ApiError(body?.error?.message || 'Something went wrong. Please try again.', response.status)
+  if (!response.ok || !payload?.success) {
+    throw new ApiError(
+      payload?.error?.message || 'Something went wrong. Please try again.',
+      response.status,
+      payload?.error?.details ?? null
+    )
   }
 
-  return body.data
+  return payload.data
+}
+
+// GET request. Success par server ka "data" wapas deta hai, galti par ApiError throw karta hai.
+export function apiGet(path, options) {
+  return request(path, { ...options, method: 'GET' })
+}
+
+// POST request, JSON body ke saath.
+export function apiPost(path, body, options) {
+  return request(path, { ...options, method: 'POST', body })
 }

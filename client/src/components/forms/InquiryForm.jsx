@@ -33,6 +33,13 @@ function InquiryForm() {
   const [result, setResult] = useState(null)
   const formRef = useRef(null)
 
+  // Pehle galat field par focus bhejo (keyboard aur screen reader users ke liye)
+  function focusFirstInvalid() {
+    setTimeout(() => {
+      formRef.current?.querySelector('[aria-invalid="true"]')?.focus()
+    }, 0)
+  }
+
   function handleChange(event) {
     const { name, value } = event.target
     setValues((prev) => ({ ...prev, [name]: value }))
@@ -62,10 +69,7 @@ function InquiryForm() {
     setErrors(validationErrors)
 
     if (Object.keys(validationErrors).length > 0) {
-      // Pehle galat field par focus bhejo (keyboard aur screen reader users ke liye)
-      setTimeout(() => {
-        formRef.current?.querySelector('[aria-invalid="true"]')?.focus()
-      }, 0)
+      focusFirstInvalid()
       return
     }
 
@@ -83,7 +87,18 @@ function InquiryForm() {
       setResult(data)
       setStatus('success')
     } catch (error) {
-      setSubmitError(error.message || 'Something went wrong. Please try again.')
+      // Server ne field-wise errors bheje (frontend aur backend ke rules alag ho jaye toh bhi kaam kare)
+      if (error.status === 400 && Array.isArray(error.details) && error.details.length > 0) {
+        const serverErrors = {}
+        error.details.forEach(({ field, message }) => {
+          serverErrors[field] = message
+        })
+        setErrors(serverErrors)
+        setSubmitError('Please fix the highlighted fields and try again.')
+        focusFirstInvalid()
+      } else {
+        setSubmitError(error.message || 'Something went wrong. Please try again.')
+      }
       setStatus('error')
     }
   }

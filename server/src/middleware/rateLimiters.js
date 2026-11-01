@@ -1,4 +1,5 @@
 import { rateLimit } from 'express-rate-limit'
+import { env } from '../config/env.js'
 
 function createLimiter({ windowMs, limit, message, skipSuccessfulRequests = false }) {
   return rateLimit({
@@ -21,10 +22,10 @@ export const apiLimiter = createLimiter({
   message: 'Too many requests. Please try again later.',
 })
 
-// Inquiry form par lagega (Day 17): ek IP se 1 ghante mein sirf 5
+// Inquiry form: ek IP se 1 ghante mein 5 (production). Development mein 30, taaki testing ho sake.
 export const inquiryLimiter = createLimiter({
   windowMs: 60 * 60 * 1000,
-  limit: 5,
+  limit: env.isProduction ? 5 : 30,
   message: 'You have sent too many requests. Please try again in an hour.',
 })
 

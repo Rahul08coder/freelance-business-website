@@ -31,6 +31,7 @@ Validation errors can also include `details`:
 | 404 | Not found |
 | 409 | Duplicate record |
 | 413 | Request body too large |
+| 415 | Unsupported content type (JSON required) |
 | 429 | Too many requests (rate limit) |
 | 500 | Server error |
 | 503 | Service unavailable (for example, database not connected) |
@@ -43,7 +44,9 @@ Validation errors can also include `details`:
 | GET | /api/services | List enabled services | None | 16 | Implemented |
 | GET | /api/projects | List projects (optional `?featured=true`) | None | 16 | Implemented |
 | GET | /api/projects/:slug | Get one project | None | 16 | Implemented |
-| POST | /api/inquiries | Submit a project inquiry (rate limited) | None | 17 | Planned |
+| POST | /api/inquiries | Submit a project inquiry (rate limited) | None | 17 | Implemented |
+
+There is no public endpoint to read inquiries. Inquiries are private and are only readable by the admin.
 
 ## Admin endpoints (all require login except login itself)
 
@@ -112,6 +115,52 @@ Site settings endpoints are optional and will be decided on Day 22.
       { "success": true, "data": { "project": { "slug": "taskflow", "...": "...", "overview": "...", "features": ["..."] } } }
 
 - Errors: 400 invalid slug, 404 project not found, 429, 500.
+
+### POST /api/inquiries
+
+- Purpose: submit a project inquiry from the Start a Project form.
+- Auth: none. Rate limit: 5 per hour per IP in production (30 in development), plus the general API limit.
+- Request header: `Content-Type: application/json`. Body limit: 20 KB.
+- Request body (unknown fields are ignored; `status` and `inquiryId` can never be set by the client):
+
+      {
+        "name": "Test Client",
+        "email": "client@example.com",
+        "company": "",
+        "projectType": "business-website",
+        "budget": "10k-25k",
+        "deadline": "1-month",
+        "description": "I need a simple business website with five pages.",
+        "referenceUrl": "",
+        "notes": ""
+      }
+
+- Validation rules:
+
+| Field | Required | Rule |
+|---|---|---|
+| name | Yes | 2 to 80 characters |
+| email | Yes | valid email, at most 254 characters, saved in lowercase |
+| company | No | at most 100 characters |
+| projectType | Yes | slug of an enabled service, or `other` |
+| budget | Yes | one of `under-10k`, `10k-25k`, `25k-50k`, `50k-100k`, `above-100k`, `not-sure` |
+| deadline | Yes | one of `asap`, `2-weeks`, `1-month`, `1-3-months`, `flexible` |
+| description | Yes | 20 to 2000 characters |
+| referenceUrl | No | empty, or a link starting with `http://` or `https://`, at most 300 characters |
+| notes | No | at most 1000 characters |
+
+- Text is trimmed. Hidden control characters are removed. Line breaks in single-line fields become spaces.
+- Success (201): the inquiry was saved. The status starts as `new`.
+
+      { "success": true, "data": { "inquiryId": "INQ-K7M2X9PQ" } }
+
+- Duplicate (200): the same email and description sent again within 10 minutes. No new record is created and the existing `inquiryId` is returned.
+- Errors:
+  - 400 validation failed (with `details`), or invalid JSON
+  - 413 body too large
+  - 415 content type is not JSON
+  - 429 rate limit
+  - 500 server error
 
 ### Any unknown route
 
