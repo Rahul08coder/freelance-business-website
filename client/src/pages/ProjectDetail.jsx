@@ -1,10 +1,12 @@
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Check, Code, ExternalLink } from 'lucide-react'
-import { projects } from '../config/content.js'
+import { useFetch } from '../hooks/useFetch.js'
 import { usePageTitle } from '../hooks/usePageTitle.js'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import Section from '../components/ui/Section.jsx'
 import Card from '../components/ui/Card.jsx'
+import LoadingBlock from '../components/ui/LoadingBlock.jsx'
+import ErrorBlock from '../components/ui/ErrorBlock.jsx'
 import CtaBanner from '../components/home/CtaBanner.jsx'
 import NotFound from './NotFound.jsx'
 
@@ -14,13 +16,33 @@ const linkClass =
 function ProjectDetail() {
   // URL /portfolio/taskflow ho toh slug = 'taskflow'
   const { slug } = useParams()
-  const project = projects.find((item) => item.slug === slug)
+  const { data, loading, error, retry } = useFetch(`/projects/${encodeURIComponent(slug)}`)
 
-  usePageTitle(project ? project.title : 'Project not found')
+  const project = data?.project
+  const isNotFound = error && (error.status === 404 || error.status === 400)
 
-  // Galat slug par 404 page dikhao
-  if (!project) {
+  // Hook hamesha sabse pehle, kisi return se pehle
+  usePageTitle(project ? project.title : isNotFound ? 'Project not found' : 'Project')
+
+  if (loading) {
+    return (
+      <Section>
+        <LoadingBlock label="Loading project..." />
+      </Section>
+    )
+  }
+
+  // Galat ya na milne wale slug par 404 page
+  if (isNotFound) {
     return <NotFound />
+  }
+
+  if (error) {
+    return (
+      <Section>
+        <ErrorBlock message={error.message} onRetry={retry} />
+      </Section>
+    )
   }
 
   const hasExternalLinks = project.githubUrl || project.liveUrl
