@@ -20,5 +20,6 @@ export default async function requireAdmin(req, res, next) {
   }
 
   req.admin = admin
+  req.sessionToken = token // CSRF token isi se banta hai
   next()
 }

@@ -1,24 +1,31 @@
 # Security Notes (backend)
 
-Status: **base layer only (Day 15).** Admin authentication, CSRF protection and a full
-security review are planned for Days 18, 19 and 23. This project is not claimed to be
-production-secure until those are done and tested.
+Status: **built, not yet fully tested.** Automated and manual security tests, and a full review,
+are planned for Days 23 to 25. This project is not claimed to be production-secure until
+those are done.
 
-## What is in place now
+## What is in place
 
-| Protection | How | File |
+| Area | Protection | Where |
 |---|---|---|
-| Security headers | `helmet()` | `src/app.js` |
-| Hidden framework header | `x-powered-by` disabled | `src/app.js` |
-| CORS allowlist | Only origins in `CLIENT_ORIGINS` can call the API from a browser | `src/config/cors.js` |
-| Request body limit | `express.json({ limit: '10kb' })` | `src/app.js` |
-| Rate limit (all API routes) | 300 requests per 15 minutes per IP, `/api/health` excluded | `src/middleware/rateLimiters.js` |
-| Inquiry rate limit | 5 per hour per IP (defined, applied on Day 17) | `src/middleware/rateLimiters.js` |
-| Login rate limit | 5 failed attempts per 15 minutes per IP (defined, applied on Day 18) | `src/middleware/rateLimiters.js` |
-| Safe error responses | Internal error details are never sent to the client | `src/middleware/errorHandler.js` |
-| Safe logging | Only method, path, status and time. No body, query, headers or cookies | `src/middleware/requestLogger.js` |
-| Strict env checks | Server refuses to start with missing or invalid settings | `src/config/env.js` |
-| Secrets out of Git | `.env` is ignored, `.env.example` has placeholders only | `.gitignore` |
+| Headers | `helmet()`, and `X-Powered-By` disabled | `src/app.js` |
+| Browser access | CORS allowlist from `CLIENT_ORIGINS`. Unknown origins get 403 on every method. | `src/config/cors.js` |
+| Request size | JSON body limit 20 KB | `src/app.js` |
+| Rate limits | General API: 300 per 15 min per IP (health excluded). Inquiry: 5 per hour (30 in development). Login: 5 failed attempts per 15 min. | `src/middleware/rateLimiters.js` |
+| Input validation | Zod schemas, unknown fields dropped, control characters removed, types checked (blocks `{"$ne": null}` style input) | `src/validation/` |
+| Database rules | Mongoose schemas as a second layer of validation | `src/models/` |
+| Passwords | bcryptjs (cost 12). Never stored or logged in plain text. Hash never returned by the API. | `src/utils/password.js`, `src/models/Admin.js` |
+| Admin creation | One-time script with hidden password input. No public registration. | `src/scripts/createAdmin.js` |
+| Sessions | Random 256-bit token in an HTTP-only cookie. Only its SHA-256 hash is stored. 12 hour lifetime, TTL index, real logout. | `src/services/sessionService.js` |
+| Cookie | HttpOnly, SameSite=Lax, Secure in production, path `/api/admin` | `src/config/auth.js` |
+| CSRF | `X-CSRF-Token` header (HMAC of the session token, constant-time compare) on every POST, PATCH and DELETE after login | `src/middleware/requireCsrf.js` |
+| Admin access | `requireAdmin` runs on the server for every admin route. Fails closed. Admin responses use `no-store`. | `src/middleware/requireAdmin.js` |
+| Login | Same error for wrong email and wrong password. A dummy hash check keeps timing similar. | `src/controllers/adminAuthController.js` |
+| Errors | Internal error details are never sent to the client | `src/middleware/errorHandler.js` |
+| Logging | Only method, path, status and time. No body, query, headers or cookies. | `src/middleware/requestLogger.js` |
+| Startup checks | Server refuses to start with missing or invalid settings | `src/config/env.js` |
+| Secrets | `.env` is ignored by Git. `.env.example` has placeholders only. | `.gitignore` |
+| Privacy | Inquiries have no public read endpoint. No IP address is stored. | `src/routes/` |
 
 ## Environment variables
 
@@ -34,28 +41,23 @@ production-secure until those are done and tested.
 
 ## Error response format
 
-    { "success": false, "error": { "message": "Validation failed.", "details": [ { "field": "email", "message": "Please enter a valid email address." } ] } }
+    { "success": false, "error": { "message": "Validation failed.", "details": [ { "field": "email", "message": "..." } ] } }
 
-`details` is only present for validation errors.
-
-| Status | When |
-|---|---|
-| 400 | Invalid JSON, validation failed, invalid id |
-| 403 | Origin not allowed |
-| 404 | Route not found |
-| 409 | Duplicate record |
-| 413 | Request body too large |
-| 429 | Rate limit exceeded |
-| 500 | Server error (generic message only) |
+`details` is only present for validation errors. Status codes used: 400, 401, 403, 404, 409, 413, 415, 429, 500, 503.
 
 ## Known limitations and risks
 
-- CORS only stops browsers. Scripts and `curl` can still call the API, so validation,
-  rate limits and authentication are the real protection.
+- CORS and the Origin check only affect browsers. Scripts and `curl` can still call the API, so
+  validation, rate limits and authentication are the real protection.
 - Requests without an `Origin` header are allowed (needed for Thunder Client and server tools).
-  CSRF protection for admin actions comes on Day 19.
-- Rate limit counters are kept in memory. They reset when the server restarts and are not
-  shared between multiple server instances.
-- MongoDB Atlas currently allows connections from any IP (`0.0.0.0/0`) for development.
-  The database user should be limited to `readWrite` on the development database, and this
-  must be reviewed before going live.
+  Browsers always send `Origin` on cross-site POST, PATCH and DELETE, and the CSRF token is also required.
+- Rate limit counters are kept in memory. They reset when the server restarts and are not shared
+  between several server instances. The login limit is per IP only, so an attacker using many IPs
+  against one account is not stopped.
+- There is no email alert for new inquiries.
+- MongoDB Atlas currently allows connections from any IP (`0.0.0.0/0`) for development. The
+  database user should be limited to `readWrite` on the development database. Review before launch.
+- Cookies in production: the frontend (Vercel) and API (Render) will be on different sites. The plan is a
+  Vercel rewrite so the browser talks to one site. This is not set up or tested yet.
+- A session cannot be revoked remotely, except by logging out or by resetting the admin password
+  (which deletes all sessions).
