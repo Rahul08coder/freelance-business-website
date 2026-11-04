@@ -89,3 +89,26 @@ The script asks for an email, asks you to confirm the database name, and asks fo
 It refuses to run if an admin already exists. To change the password (this also signs out every existing login):
 
     node --env-file=.env src/scripts/createAdmin.js --reset-password
+
+
+## GET /api/admin/dashboard
+
+- Purpose: summary numbers and the 5 newest inquiries for the admin dashboard.
+- Auth: admin session cookie.
+- Success (200):
+
+      {
+        "success": true,
+        "data": {
+          "inquiries": {
+            "total": 12,
+            "last7Days": 3,
+            "byStatus": { "new": 4, "under-review": 2, "contacted": 1, "accepted": 0, "in-progress": 0, "completed": 5, "rejected": 0 },
+            "recent": [ { "inquiryId": "INQ-K7M2X9PQ", "name": "Test Client", "projectType": "business-website", "status": "new", "createdAt": "2026-11-03T10:00:00.000Z" } ]
+          },
+          "projects": { "total": 3, "featured": 3 },
+          "services": { "total": 8, "enabled": 8 }
+        }
+      }
+
+- Errors: 401 not logged in.

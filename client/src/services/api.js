@@ -8,6 +8,20 @@ const API_URL = (
 // 30 second: hosting ka free server so jata hai, pehli request dheere aati hai
 const REQUEST_TIMEOUT_MS = 30000
 
+// CSRF token sirf memory mein (is variable mein). localStorage ya cookie mein kabhi nahi.
+let csrfToken = null
+
+export function setCsrfToken(token) {
+  csrfToken = token || null
+}
+
+// Admin request par 401 aaye (session khatam) toh AuthProvider ko batane ke liye
+let unauthorizedHandler = null
+
+export function setUnauthorizedHandler(handler) {
+  unauthorizedHandler = handler
+}
+
 export class ApiError extends Error {
   // details: server ke validation errors ki list, jaise [{ field: 'email', message: '...' }]
   constructor(message, status = 0, details = null) {
@@ -30,13 +44,17 @@ async function request(path, { method = 'GET', body, signal } = {}) {
   if (body !== undefined) {
     headers['Content-Type'] = 'application/json'
   }
+  // Badlaav wali requests (POST, PATCH, DELETE) ke saath CSRF token zaroori hai
+  if (method !== 'GET' && csrfToken) {
+    headers['X-CSRF-Token'] = csrfToken
+  }
 
   let response
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
       headers,
-      credentials: 'include', // admin cookie ke liye (Day 18)
+      credentials: 'include', // admin cookie ke liye
       body: body !== undefined ? JSON.stringify(body) : undefined,
       signal: combinedSignal,
     })
@@ -57,6 +75,16 @@ async function request(path, { method = 'GET', body, signal } = {}) {
   }
 
   if (!response.ok || !payload?.success) {
+    // Admin session khatam ho gaya (login wali request ko chhodkar)
+    if (
+      response.status === 401 &&
+      path.startsWith('/admin') &&
+      !path.startsWith('/admin/login') &&
+      unauthorizedHandler
+    ) {
+      unauthorizedHandler()
+    }
+
     throw new ApiError(
       payload?.error?.message || 'Something went wrong. Please try again.',
       response.status,
@@ -67,12 +95,18 @@ async function request(path, { method = 'GET', body, signal } = {}) {
   return payload.data
 }
 
-// GET request. Success par server ka "data" wapas deta hai, galti par ApiError throw karta hai.
 export function apiGet(path, options) {
   return request(path, { ...options, method: 'GET' })
 }
 
-// POST request, JSON body ke saath.
 export function apiPost(path, body, options) {
   return request(path, { ...options, method: 'POST', body })
+}
+
+export function apiPatch(path, body, options) {
+  return request(path, { ...options, method: 'PATCH', body })
+}
+
+export function apiDelete(path, options) {
+  return request(path, { ...options, method: 'DELETE' })
 }

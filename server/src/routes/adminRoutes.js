@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { getMe, login, logout } from '../controllers/adminAuthController.js'
+import { getDashboard } from '../controllers/adminDashboardController.js'
 import requireAdmin from '../middleware/requireAdmin.js'
 import requireCsrf from '../middleware/requireCsrf.js'
 import { loginLimiter } from '../middleware/rateLimiters.js'
@@ -21,8 +22,9 @@ router.use(requireCsrf)
 
 router.post('/logout', logout)
 router.get('/me', getMe)
+router.get('/dashboard', getDashboard)
 
-// Day 20 se yahan dashboard, inquiries, projects, services ke routes jodenge.
+// Part 2 mein yahan inquiries ke routes jodenge.
 // Niyam: GET se kabhi koi badlaav nahi. Badlaav sirf POST, PATCH, DELETE se.
 
 export default router

@@ -55,7 +55,7 @@ There is no public endpoint to read inquiries. Inquiries are private and are onl
 | POST | /api/admin/login | Log in (sets HTTP-only cookie, rate limited) | 18 | Implemented |
 | POST | /api/admin/logout | Log out | 18 | Implemented |
 | GET | /api/admin/me | Get the logged-in admin | 18 | Implemented |
-| GET | /api/admin/dashboard | Dashboard summary counts | 20 | Planned |
+| GET | /api/admin/dashboard | Dashboard summary counts | 20 | Implemented |
 | GET | /api/admin/inquiries | List inquiries (search, status filter, pages) | 20 | Planned |
 | GET | /api/admin/inquiries/:id | Get one inquiry | 20 | Planned |
 | PATCH | /api/admin/inquiries/:id | Update inquiry status | 20 | Planned |
