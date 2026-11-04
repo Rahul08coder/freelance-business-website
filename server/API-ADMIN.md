@@ -159,3 +159,53 @@ It refuses to run if an admin already exists. To change the password (this also 
 - Auth: admin session cookie and `X-CSRF-Token`.
 - Success (200): `{ "success": true, "data": { "deleted": true } }`
 - Errors: 400 invalid id, 401, 403, 404.
+
+
+## Projects
+
+All project routes need an admin session cookie. POST, PATCH and DELETE also need `X-CSRF-Token`.
+Changes show on the public website straight away (the public project endpoints read the same data).
+
+### GET /api/admin/projects
+
+- Purpose: list all projects with their ids, sorted by `order`, then newest first.
+- Success (200): `{ "success": true, "data": { "projects": [ { "id": "...", "slug": "taskflow", "title": "...", "category": "Full-stack", "description": "...", "tech": ["..."], "githubUrl": "", "liveUrl": "", "featured": true, "order": 0, "updatedAt": "..." } ] } }`
+
+### GET /api/admin/projects/:id
+
+- Purpose: get one project. Same fields as the list, plus `overview`, `features` and `createdAt`.
+- Errors: 400 invalid id, 404 not found.
+
+### POST /api/admin/projects
+
+- Purpose: create a project. Content-Type must be JSON.
+- Request body (unknown fields are ignored):
+
+| Field | Required | Rule |
+|---|---|---|
+| title | Yes | 2 to 100 characters |
+| slug | Yes | lowercase letters, numbers and hyphens, at most 80. Must be unique. It becomes the public address `/portfolio/<slug>`. |
+| category | Yes | `Full-stack`, `Frontend` or `Backend` |
+| description | Yes | at most 300 characters (shown on cards) |
+| overview | Yes | at most 3000 characters (shown on the detail page) |
+| features | No | list of up to 15 texts, each at most 200 characters |
+| tech | No | list of up to 15 texts, each at most 40 characters |
+| githubUrl, liveUrl | No | empty, or a link starting with `http://` or `https://`, at most 300 characters |
+| featured | No | `true` or `false`. Default `false`. |
+| order | No | whole number 0 to 9999. Default: after the last project. |
+
+- Success (201): `{ "success": true, "data": { "project": { ...detail } } }`
+- Errors: 400 validation failed (with `details`), 401, 403, 409 slug already used (`details` points to `slug`), 415.
+
+### PATCH /api/admin/projects/:id
+
+- Purpose: change some fields of a project. Only the fields you send are changed. Same rules as POST.
+- Request body: for example `{ "featured": true }` or `{ "liveUrl": "https://example.com" }`
+- Success (200): the updated project (detail).
+- Errors: 400 invalid id, invalid field, or an empty body (`No changes were sent.`), 401, 403, 404, 409 slug already used, 415.
+
+### DELETE /api/admin/projects/:id
+
+- Purpose: permanently delete a project. The admin screen asks for confirmation first.
+- Success (200): `{ "success": true, "data": { "deleted": true } }`
+- Errors: 400 invalid id, 401, 403, 404.

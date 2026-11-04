@@ -6,6 +6,8 @@ import AdminLogin from './AdminLogin.jsx'
 import AdminDashboard from './AdminDashboard.jsx'
 import AdminInquiries from './AdminInquiries.jsx'
 import AdminInquiryDetail from './AdminInquiryDetail.jsx'
+import AdminProjects from './AdminProjects.jsx'
+import { AdminProjectEdit, AdminProjectNew } from './AdminProjectForm.jsx'
 
 // Poora admin hissa yahan hai. App.jsx ise "lazy" (zaroorat padne par) load karta hai,
 // isliye public visitors ko admin ka code download hi nahi hota.
@@ -21,6 +23,9 @@ function AdminApp() {
             <Route index element={<AdminDashboard />} />
             <Route path="inquiries" element={<AdminInquiries />} />
             <Route path="inquiries/:id" element={<AdminInquiryDetail />} />
+            <Route path="projects" element={<AdminProjects />} />
+            <Route path="projects/new" element={<AdminProjectNew />} />
+            <Route path="projects/:id/edit" element={<AdminProjectEdit />} />
           </Route>
         </Route>
 

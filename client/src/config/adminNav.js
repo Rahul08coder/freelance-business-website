@@ -2,4 +2,5 @@
 export const adminNavLinks = [
   { label: 'Dashboard', path: '/admin' },
   { label: 'Inquiries', path: '/admin/inquiries' },
+  { label: 'Projects', path: '/admin/projects' },
 ]
