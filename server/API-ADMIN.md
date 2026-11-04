@@ -112,3 +112,50 @@ It refuses to run if an admin already exists. To change the password (this also 
       }
 
 - Errors: 401 not logged in.
+
+## GET /api/admin/inquiries
+
+- Purpose: list inquiries, newest first, with search, status filter and pages.
+- Auth: admin session cookie.
+- Query (all optional):
+
+| Name | Rule |
+|---|---|
+| search | text, at most 100 characters. Matches reference ID, name, email, company and description (case-insensitive). Special characters are treated as plain text. |
+| status | one of `new`, `under-review`, `contacted`, `accepted`, `in-progress`, `completed`, `rejected` |
+| page | whole number from 1 to 10000. Default 1. |
+| limit | whole number from 1 to 50. Default 10. |
+
+- Success (200):
+
+      {
+        "success": true,
+        "data": {
+          "inquiries": [ { "id": "6720...", "inquiryId": "INQ-K7M2X9PQ", "name": "Test Client", "email": "client@example.com", "company": "", "projectType": "business-website", "budget": "10k-25k", "deadline": "1-month", "status": "new", "createdAt": "2026-11-03T10:00:00.000Z" } ],
+          "pagination": { "page": 1, "limit": 10, "total": 3, "totalPages": 1 }
+        }
+      }
+
+- Errors: 400 invalid query (for example `status=bogus`, `limit=500`, `page=0`, or a repeated key), 401.
+
+## GET /api/admin/inquiries/:id
+
+- Purpose: get one inquiry with all its details.
+- Auth: admin session cookie. `:id` must be a 24 character hex id.
+- Success (200): `{ "success": true, "data": { "inquiry": { ...list fields, "description": "...", "referenceUrl": "", "notes": "", "updatedAt": "..." } } }`
+- Errors: 400 invalid id, 401, 404 inquiry not found.
+
+## PATCH /api/admin/inquiries/:id
+
+- Purpose: change the status of an inquiry. Nothing else can be changed.
+- Auth: admin session cookie and `X-CSRF-Token`. Content-Type must be JSON.
+- Request body: `{ "status": "contacted" }`
+- Success (200): the updated inquiry, same shape as GET /api/admin/inquiries/:id.
+- Errors: 400 invalid id or status, 401, 403 missing or wrong CSRF token, 404, 415.
+
+## DELETE /api/admin/inquiries/:id
+
+- Purpose: permanently delete an inquiry. The admin screen asks for confirmation first.
+- Auth: admin session cookie and `X-CSRF-Token`.
+- Success (200): `{ "success": true, "data": { "deleted": true } }`
+- Errors: 400 invalid id, 401, 403, 404.

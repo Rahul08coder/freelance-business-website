@@ -35,7 +35,13 @@ function AdminLayout() {
             </Link>
             <nav aria-label="Admin navigation" className="flex gap-1">
               {adminNavLinks.map((link) => (
-                <NavLink key={link.path} to={link.path} end className={navLinkClass}>
+                // Dashboard par "end": warna /admin har admin page par highlight rehta
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  end={link.path === '/admin'}
+                  className={navLinkClass}
+                >
                   {link.label}
                 </NavLink>
               ))}

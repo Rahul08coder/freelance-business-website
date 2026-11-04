@@ -56,10 +56,10 @@ There is no public endpoint to read inquiries. Inquiries are private and are onl
 | POST | /api/admin/logout | Log out | 18 | Implemented |
 | GET | /api/admin/me | Get the logged-in admin | 18 | Implemented |
 | GET | /api/admin/dashboard | Dashboard summary counts | 20 | Implemented |
-| GET | /api/admin/inquiries | List inquiries (search, status filter, pages) | 20 | Planned |
-| GET | /api/admin/inquiries/:id | Get one inquiry | 20 | Planned |
-| PATCH | /api/admin/inquiries/:id | Update inquiry status | 20 | Planned |
-| DELETE | /api/admin/inquiries/:id | Delete an inquiry | 20 | Planned |
+| GET | /api/admin/inquiries | List inquiries (search, status filter, pages) | 20 | Implemented |
+| GET | /api/admin/inquiries/:id | Get one inquiry | 20 | Implemented |
+| PATCH | /api/admin/inquiries/:id | Update inquiry status | 20 | Implemented |
+| DELETE | /api/admin/inquiries/:id | Delete an inquiry | 20 | Implemented |
 | POST | /api/admin/projects | Create a project | 21 | Planned |
 | PATCH | /api/admin/projects/:id | Update a project (including featured) | 21 | Planned |
 | DELETE | /api/admin/projects/:id | Delete a project | 21 | Planned |
