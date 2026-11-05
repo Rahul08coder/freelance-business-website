@@ -14,6 +14,13 @@ import {
   listAllProjects,
   updateProject,
 } from '../controllers/adminProjectController.js'
+import {
+  createService,
+  deleteService,
+  getServiceById,
+  listAllServices,
+  updateService,
+} from '../controllers/adminServiceController.js'
 import requireAdmin from '../middleware/requireAdmin.js'
 import requireCsrf from '../middleware/requireCsrf.js'
 import validateObjectId from '../middleware/validateObjectId.js'
@@ -50,6 +57,13 @@ router.post('/projects', createProject)
 router.get('/projects/:id', validateObjectId(), getProjectById)
 router.patch('/projects/:id', validateObjectId(), updateProject)
 router.delete('/projects/:id', validateObjectId(), deleteProject)
+
+// Services
+router.get('/services', listAllServices)
+router.post('/services', createService)
+router.get('/services/:id', validateObjectId(), getServiceById)
+router.patch('/services/:id', validateObjectId(), updateService)
+router.delete('/services/:id', validateObjectId(), deleteService)
 
 // Niyam: GET se kabhi koi badlaav nahi. Badlaav sirf POST, PATCH, DELETE se.
 

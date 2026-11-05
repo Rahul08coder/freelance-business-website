@@ -1,10 +1,11 @@
-import { projectTypeOptions, budgetOptions, deadlineOptions } from '../config/formOptions.js'
+import { budgetOptions, deadlineOptions } from '../config/formOptions.js'
 
-// Maximum aur minimum lengths. Day 17 mein backend mein bhi yahi rakhenge.
+// Maximum aur minimum lengths. Backend (server/src/config/constants.js) mein bhi yahi hain.
 export const LIMITS = {
   name: { min: 2, max: 80 },
   email: { max: 254 },
   company: { max: 100 },
+  projectType: { max: 60 },
   description: { min: 20, max: 2000 },
   referenceUrl: { max: 300 },
   notes: { max: 1000 },
@@ -25,6 +26,7 @@ export const initialValues = {
 }
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 function isValidHttpUrl(value) {
   try {
@@ -62,9 +64,12 @@ export function validateField(name, rawValue) {
       }
       return ''
 
+    // List database se aati hai, isliye yahan sirf format check. Asli check server karta hai.
     case 'projectType':
       if (!value) return 'Please choose a project type.'
-      if (!isAllowed(projectTypeOptions, value)) return 'Please choose one of the listed project types.'
+      if (value.length > LIMITS.projectType.max || !slugPattern.test(value)) {
+        return 'Please choose a valid project type.'
+      }
       return ''
 
     case 'budget':

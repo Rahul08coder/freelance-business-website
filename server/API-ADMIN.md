@@ -209,3 +209,47 @@ Changes show on the public website straight away (the public project endpoints r
 - Purpose: permanently delete a project. The admin screen asks for confirmation first.
 - Success (200): `{ "success": true, "data": { "deleted": true } }`
 - Errors: 400 invalid id, 401, 403, 404.
+
+## Services
+
+All service routes need an admin session cookie. POST, PATCH and DELETE also need `X-CSRF-Token`.
+A service shows on the website and in the Start a Project form only while `enabled` is true.
+
+### GET /api/admin/services
+
+- Purpose: list all services (also disabled ones) with their ids, sorted by `order`.
+- Success (200): `{ "success": true, "data": { "services": [ { "id": "...", "slug": "business-website", "title": "...", "description": "...", "icon": "Globe", "enabled": true, "order": 0, "updatedAt": "..." } ] } }`
+
+### GET /api/admin/services/:id
+
+- Purpose: get one service. Same fields as the list.
+- Errors: 400 invalid id, 404 not found.
+
+### POST /api/admin/services
+
+- Purpose: create a service. Content-Type must be JSON. Unknown fields are ignored.
+
+| Field | Required | Rule |
+|---|---|---|
+| slug | Yes | lowercase letters, numbers and hyphens, at most 60. Unique. **Cannot be changed later.** |
+| title | Yes | 2 to 100 characters |
+| description | Yes | at most 300 characters |
+| icon | No | one of `Globe`, `LayoutTemplate`, `Code`, `Layers`, `Bug`, `Smartphone`, `Plug`, `Database`, `Palette`, `Server`, `Rocket`, `Wrench`, `Search`. Default `Code`. |
+| enabled | No | `true` or `false`. Default `true`. |
+| order | No | whole number 0 to 9999. Default: after the last service. |
+
+- Success (201): `{ "success": true, "data": { "service": { ... } } }`
+- Errors: 400 validation failed (with `details`), 401, 403, 409 slug already used, 415.
+
+### PATCH /api/admin/services/:id
+
+- Purpose: change some fields. Only the fields you send are changed. `slug` cannot be changed (400 if sent).
+- Request body: for example `{ "enabled": false }`
+- Success (200): the updated service.
+- Errors: 400 invalid id, invalid field, slug sent, or an empty body, 401, 403, 404, 415.
+
+### DELETE /api/admin/services/:id
+
+- Purpose: permanently delete a service. Old inquiries keep their project type text.
+- Success (200): `{ "success": true, "data": { "deleted": true } }`
+- Errors: 400 invalid id, 401, 403, 404.

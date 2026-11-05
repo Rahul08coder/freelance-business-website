@@ -1,16 +1,17 @@
 // Form ke dropdown options yahan hain.
-// Day 17 mein backend bhi inhi values ko validate karega, isliye values (value) mat badalna,
-// sirf label badal sakte ho.
+// Day 17 se backend (server/src/config/constants.js) bhi inhi values ko validate karta hai,
+// isliye budget aur deadline ki values (value) mat badalna, sirf label badal sakte ho.
 
-import { services } from './site.js'
+// Project types ab database ki services se aate hain (GET /api/services).
+// "Other" hamesha aakhir mein alag se jodte hain.
+export const OTHER_PROJECT_TYPE = { value: 'other', label: 'Something else / not sure yet' }
 
-// Project types services se apne aap bante hain (sirf enabled wali)
-export const projectTypeOptions = [
-  ...services
-    .filter((service) => service.enabled)
-    .map((service) => ({ value: service.id, label: service.title })),
-  { value: 'other', label: 'Something else / not sure yet' },
-]
+export function buildProjectTypeOptions(services) {
+  return [
+    ...services.map((service) => ({ value: service.id, label: service.title })),
+    OTHER_PROJECT_TYPE,
+  ]
+}
 
 export const budgetOptions = [
   { value: 'under-10k', label: 'Under ₹10,000' },

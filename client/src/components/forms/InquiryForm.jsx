@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { budgetOptions, deadlineOptions, projectTypeOptions } from '../../config/formOptions.js'
+import { budgetOptions, buildProjectTypeOptions, deadlineOptions } from '../../config/formOptions.js'
 import {
   LIMITS,
   buildPayload,
@@ -8,15 +8,20 @@ import {
   validateAll,
   validateField,
 } from '../../utils/inquiryValidation.js'
+import { useFetch } from '../../hooks/useFetch.js'
 import { submitInquiry } from '../../services/inquiryService.js'
 import Input from '../ui/Input.jsx'
 import Select from '../ui/Select.jsx'
 import Textarea from '../ui/Textarea.jsx'
 import Button from '../ui/Button.jsx'
+import LoadingBlock from '../ui/LoadingBlock.jsx'
+import ErrorBlock from '../ui/ErrorBlock.jsx'
 import InquirySuccess from './InquirySuccess.jsx'
 
-function InquiryForm() {
+// Asli form. projectTypeOptions bahar se milte hain (API se aayi services + "Other").
+function InquiryFormFields({ projectTypeOptions }) {
   // /start-project?service=mern-fullstack ho toh project type pehle se select ho jata hai
+  // (sirf tab, jab wo service abhi enabled ho)
   const [searchParams] = useSearchParams()
   const presetService = searchParams.get('service')
 
@@ -271,6 +276,21 @@ function InquiryForm() {
       </div>
     </form>
   )
+}
+
+// Pehle services (project types) laata hai. Aa jayein tabhi form dikhta hai.
+function InquiryForm() {
+  const { data, loading, error, retry } = useFetch('/services')
+
+  if (loading) {
+    return <LoadingBlock label="Loading the form..." />
+  }
+
+  if (error) {
+    return <ErrorBlock message={error.message} onRetry={retry} />
+  }
+
+  return <InquiryFormFields projectTypeOptions={buildProjectTypeOptions(data.services)} />
 }
 
 export default InquiryForm

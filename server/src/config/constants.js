@@ -17,7 +17,24 @@ export const INQUIRY_STATUSES = [
 
 export const PROJECT_CATEGORIES = ['Full-stack', 'Frontend', 'Backend']
 
-// Frontend ki inquiryValidation.js wali limits. Day 17 mein validation bhi yahin se padhegi.
+// Service ke icon. Ye client/src/config/icons.js ke serviceIconNames se bilkul same hone chahiye.
+export const SERVICE_ICONS = [
+  'Globe',
+  'LayoutTemplate',
+  'Code',
+  'Layers',
+  'Bug',
+  'Smartphone',
+  'Plug',
+  'Database',
+  'Palette',
+  'Server',
+  'Rocket',
+  'Wrench',
+  'Search',
+]
+
+// Frontend ki inquiryValidation.js wali limits. Day 17 mein validation bhi yahin se padhti hai.
 export const INQUIRY_LIMITS = {
   name: { min: 2, max: 80 },
   email: { max: 254 },
