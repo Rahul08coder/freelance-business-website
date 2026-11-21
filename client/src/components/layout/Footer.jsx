@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Mail } from 'lucide-react'
 import { siteConfig } from '../../config/site.js'
+import { useSettings } from '../../hooks/useSettings.js'
 import Container from '../ui/Container.jsx'
 
 const socialLabels = {
@@ -11,9 +12,10 @@ const socialLabels = {
 
 function Footer() {
   const year = new Date().getFullYear()
+  const settings = useSettings()
 
-  // Sirf wahi socials dikhao jinka link site.js mein bhara hai
-  const socialLinks = Object.entries(siteConfig.socials).filter(([, url]) => url)
+  // Sirf wahi socials dikhao jinka link bhara hai
+  const socialLinks = Object.entries(settings.socials).filter(([, url]) => url)
 
   const linkClass = 'text-sm text-muted transition hover:text-accent-600'
 
@@ -50,9 +52,12 @@ function Footer() {
             <h3 className="text-sm font-semibold">Contact</h3>
             <ul className="mt-4 space-y-2">
               <li>
-                <a href={`mailto:${siteConfig.email}`} className={`${linkClass} inline-flex items-center gap-2`}>
+                <a
+                  href={`mailto:${settings.email}`}
+                  className={`${linkClass} inline-flex items-center gap-2 break-all`}
+                >
                   <Mail size={14} aria-hidden="true" />
-                  {siteConfig.email}
+                  {settings.email}
                 </a>
               </li>
               {socialLinks.map(([name, url]) => (

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Check, Copy, Mail, MapPin } from 'lucide-react'
 import { siteConfig } from '../config/site.js'
+import { useSettings } from '../hooks/useSettings.js'
 import { usePageTitle } from '../hooks/usePageTitle.js'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import Section from '../components/ui/Section.jsx'
@@ -16,14 +17,15 @@ const socialLabels = {
 function Contact() {
   usePageTitle('Contact')
 
+  const settings = useSettings()
   const [copied, setCopied] = useState(false)
 
-  // Sirf wahi socials dikhao jinka link site.js mein bhara hai
-  const socialLinks = Object.entries(siteConfig.socials).filter(([, url]) => url)
+  // Sirf wahi socials dikhao jinka link bhara hai
+  const socialLinks = Object.entries(settings.socials).filter(([, url]) => url)
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(siteConfig.email)
+      await navigator.clipboard.writeText(settings.email)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -49,10 +51,10 @@ function Contact() {
                 <div>
                   <p className="font-medium">Email</p>
                   <a
-                    href={`mailto:${siteConfig.email}`}
+                    href={`mailto:${settings.email}`}
                     className="break-all text-muted transition hover:text-accent-600"
                   >
-                    {siteConfig.email}
+                    {settings.email}
                   </a>
                   <div className="mt-2 flex items-center gap-3">
                     <Button variant="outline" size="sm" onClick={handleCopy}>
@@ -70,13 +72,15 @@ function Contact() {
                 </div>
               </li>
 
-              <li className="flex items-start gap-3">
-                <MapPin size={18} className="mt-0.5 shrink-0 text-accent-600" aria-hidden="true" />
-                <div>
-                  <p className="font-medium">Location</p>
-                  <p className="text-muted">{siteConfig.location}</p>
-                </div>
-              </li>
+              {settings.location && (
+                <li className="flex items-start gap-3">
+                  <MapPin size={18} className="mt-0.5 shrink-0 text-accent-600" aria-hidden="true" />
+                  <div>
+                    <p className="font-medium">Location</p>
+                    <p className="text-muted">{settings.location}</p>
+                  </div>
+                </li>
+              )}
             </ul>
 
             {socialLinks.length > 0 && (

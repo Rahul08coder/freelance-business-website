@@ -21,6 +21,7 @@ import {
   listAllServices,
   updateService,
 } from '../controllers/adminServiceController.js'
+import { getAdminSettings, updateAdminSettings } from '../controllers/adminSettingsController.js'
 import requireAdmin from '../middleware/requireAdmin.js'
 import requireCsrf from '../middleware/requireCsrf.js'
 import validateObjectId from '../middleware/validateObjectId.js'
@@ -64,6 +65,10 @@ router.post('/services', createService)
 router.get('/services/:id', validateObjectId(), getServiceById)
 router.patch('/services/:id', validateObjectId(), updateService)
 router.delete('/services/:id', validateObjectId(), deleteService)
+
+// Site settings (ek hi document, isliye :id nahi)
+router.get('/settings', getAdminSettings)
+router.patch('/settings', updateAdminSettings)
 
 // Niyam: GET se kabhi koi badlaav nahi. Badlaav sirf POST, PATCH, DELETE se.
 

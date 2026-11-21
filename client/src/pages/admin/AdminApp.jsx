@@ -10,6 +10,7 @@ import AdminProjects from './AdminProjects.jsx'
 import { AdminProjectEdit, AdminProjectNew } from './AdminProjectForm.jsx'
 import AdminServices from './AdminServices.jsx'
 import { AdminServiceEdit, AdminServiceNew } from './AdminServiceForm.jsx'
+import AdminSettings from './AdminSettings.jsx'
 
 // Poora admin hissa yahan hai. App.jsx ise "lazy" (zaroorat padne par) load karta hai,
 // isliye public visitors ko admin ka code download hi nahi hota.
@@ -31,6 +32,7 @@ function AdminApp() {
             <Route path="services" element={<AdminServices />} />
             <Route path="services/new" element={<AdminServiceNew />} />
             <Route path="services/:id/edit" element={<AdminServiceEdit />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Route>
 

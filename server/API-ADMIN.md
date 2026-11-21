@@ -253,3 +253,30 @@ A service shows on the website and in the Start a Project form only while `enabl
 - Purpose: permanently delete a service. Old inquiries keep their project type text.
 - Success (200): `{ "success": true, "data": { "deleted": true } }`
 - Errors: 400 invalid id, 401, 403, 404.
+
+
+## Settings
+
+The site has one settings record (contact email, location and social links).
+Brand name, tagline and description are not editable here. They live in the frontend code.
+
+### GET /api/admin/settings
+
+- Auth: admin session cookie.
+- Success (200): `{ "success": true, "data": { "settings": { "email": "...", "location": "...", "socials": { "github": "", "linkedin": "", "twitter": "" }, "updatedAt": "..." } } }`.
+  `settings` is `null` if nothing was saved yet.
+
+### PATCH /api/admin/settings
+
+- Purpose: change the contact settings. Only the fields you send are changed, including single links inside `socials`.
+  The record is created on the first save. Content-Type must be JSON.
+- Request body (all optional, unknown fields are ignored):
+
+| Field | Rule |
+|---|---|
+| email | required if sent. Valid email, at most 254 characters, saved in lowercase. |
+| location | at most 100 characters. Empty is allowed. |
+| socials.github, socials.linkedin, socials.twitter | empty, or a link starting with `http://` or `https://`, at most 300 characters |
+
+- Success (200): the saved settings.
+- Errors: 400 invalid field (field names look like `socials.github`) or no changes, 401, 403, 415.

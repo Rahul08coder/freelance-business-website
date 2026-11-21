@@ -60,6 +60,7 @@ There is no public endpoint to read inquiries. Inquiries are private and are onl
 | GET | /api/admin/inquiries/:id | Get one inquiry | 20 | Implemented |
 | GET | /api/admin/services | List all services (with ids, including disabled) | 22 | Implemented |
 | GET | /api/admin/services/:id | Get one service | 22 | Implemented |
+| GET | /api/settings | Contact details shown on the website | None | 22 | Implemented |
 | PATCH | /api/admin/inquiries/:id | Update inquiry status | 20 | Implemented |
 | DELETE | /api/admin/inquiries/:id | Delete an inquiry | 20 | Implemented |
 | GET | /api/admin/projects | List all projects (with ids) | 21 | Implemented |
@@ -71,7 +72,8 @@ There is no public endpoint to read inquiries. Inquiries are private and are onl
 | PATCH | /api/admin/services/:id | Update a service | 22 | Implemented |
 | DELETE | /api/admin/services/:id | Delete a service | 22 | Implemented |
 
-Site settings endpoints are optional and will be decided on Day 22.
+| GET | /api/admin/settings | Get the contact settings | 22 | Implemented |
+| PATCH | /api/admin/settings | Update the contact settings | 22 | Implemented |
 
 Details for implemented admin endpoints: see API-ADMIN.md.
 
@@ -167,6 +169,18 @@ Details for implemented admin endpoints: see API-ADMIN.md.
   - 415 content type is not JSON
   - 429 rate limit
   - 500 server error
+
+
+### GET /api/settings
+
+- Purpose: the contact details shown in the footer, the contact page and the privacy policy.
+- Auth: none. Request body: none.
+- Success (200):
+
+      { "success": true, "data": { "settings": { "email": "hello@example.com", "location": "India", "socials": { "github": "https://github.com/...", "linkedin": "", "twitter": "" } } } }
+
+  `settings` is `null` until the admin saves settings for the first time. An empty link means "do not show it".
+- Errors: 429, 500.
 
 ### Any unknown route
 

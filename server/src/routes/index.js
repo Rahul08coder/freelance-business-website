@@ -3,6 +3,7 @@ import healthRoutes from './healthRoutes.js'
 import serviceRoutes from './serviceRoutes.js'
 import projectRoutes from './projectRoutes.js'
 import inquiryRoutes from './inquiryRoutes.js'
+import settingsRoutes from './settingsRoutes.js'
 import adminRoutes from './adminRoutes.js'
 import { apiLimiter } from '../middleware/rateLimiters.js'
 
@@ -18,6 +19,7 @@ router.use(apiLimiter)
 router.use('/services', serviceRoutes)
 router.use('/projects', projectRoutes)
 router.use('/inquiries', inquiryRoutes)
+router.use('/settings', settingsRoutes)
 
 // Admin routes (login ke baad)
 router.use('/admin', adminRoutes)

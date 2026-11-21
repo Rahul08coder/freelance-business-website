@@ -1,9 +1,11 @@
 import { siteConfig } from '../../config/site.js'
+import { useSettings } from '../../hooks/useSettings.js'
 import Container from '../ui/Container.jsx'
 import Button from '../ui/Button.jsx'
 
 function CtaBanner() {
-  const { cta, email } = siteConfig
+  const { cta } = siteConfig
+  const { email } = useSettings()
 
   return (
     <section className="bg-white py-16 sm:py-20">
@@ -21,7 +23,7 @@ function CtaBanner() {
             </Button>
             <a
               href={`mailto:${email}`}
-              className="text-sm font-medium text-accent-700 hover:underline"
+              className="break-all text-sm font-medium text-accent-700 hover:underline"
             >
               or email {email}
             </a>
