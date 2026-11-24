@@ -6,6 +6,7 @@ import { env } from './config/env.js'
 import { corsOptions } from './config/cors.js'
 import routes from './routes/index.js'
 import requestLogger from './middleware/requestLogger.js'
+import blockOperatorKeys from './middleware/blockOperatorKeys.js'
 import notFound from './middleware/notFound.js'
 import errorHandler from './middleware/errorHandler.js'
 
@@ -28,6 +29,9 @@ app.use(cors(corsOptions))
 
 // JSON body padhne ke liye. 20kb se bada body reject hoga.
 app.use(express.json({ limit: '20kb' }))
+
+// Body mein "$" wale naam (NoSQL operators) rok do
+app.use(blockOperatorKeys)
 
 // Cookies padhne ke liye (admin session ke liye)
 app.use(cookieParser())

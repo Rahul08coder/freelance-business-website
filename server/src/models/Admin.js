@@ -1,9 +1,13 @@
 import mongoose from 'mongoose'
 import { emailPattern } from '../utils/validators.js'
 
-// Password hata ke baaki sab dikhao. Isse JSON response mein hash kabhi nahi jayega.
-function removePasswordHash(doc, ret) {
+// Password hash aur lock ki andar ki cheezein hata ke baaki dikhao.
+// Isse JSON response mein ye kabhi nahi jayengi.
+function removePrivateFields(doc, ret) {
   delete ret.passwordHash
+  delete ret.failedLoginCount
+  delete ret.lastFailedLoginAt
+  delete ret.lockedUntil
   return ret
 }
 
@@ -36,12 +40,17 @@ const adminSchema = new mongoose.Schema(
     },
 
     lastLoginAt: { type: Date },
+
+    // Galat password ki ginti aur account lock (Day 23)
+    failedLoginCount: { type: Number, default: 0 },
+    lastFailedLoginAt: { type: Date },
+    lockedUntil: { type: Date },
   },
   {
     timestamps: true,
     versionKey: false,
-    toJSON: { transform: removePasswordHash },
-    toObject: { transform: removePasswordHash },
+    toJSON: { transform: removePrivateFields },
+    toObject: { transform: removePrivateFields },
   }
 )
 

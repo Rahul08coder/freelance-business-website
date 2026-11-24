@@ -1,17 +1,28 @@
 import { createHash, randomBytes } from 'node:crypto'
 import Session from '../models/Session.js'
-import { SESSION_TTL_MS } from '../config/auth.js'
+import { MAX_SESSIONS_PER_ADMIN, SESSION_TTL_MS } from '../config/auth.js'
 
 function hashToken(token) {
   return createHash('sha256').update(token).digest('hex')
 }
 
 // Naya session banata hai. Token sirf ek baar (cookie ke liye) wapas milta hai.
+// Ek admin ke MAX_SESSIONS_PER_ADMIN se zyada sessions ho jayein toh sabse purane hata deta hai.
 export async function createSession(adminId) {
   const token = randomBytes(32).toString('base64url') // 43 characters, guess karna namumkin
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS)
 
   await Session.create({ tokenHash: hashToken(token), admin: adminId, expiresAt })
+
+  const extra = await Session.find({ admin: adminId })
+    .sort({ createdAt: -1 })
+    .skip(MAX_SESSIONS_PER_ADMIN)
+    .select('_id')
+    .lean()
+
+  if (extra.length > 0) {
+    await Session.deleteMany({ _id: { $in: extra.map((session) => session._id) } })
+  }
 
   return { token, expiresAt }
 }

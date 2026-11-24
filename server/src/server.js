@@ -1,9 +1,18 @@
 import app from './app.js'
 import { env } from './config/env.js'
 import { connectDB, disconnectDB, explainConnectionError } from './config/db.js'
+import { runProductionChecks } from './config/productionChecks.js'
 
 async function start() {
-  // Pehle database. Connect na ho toh server start hi nahi karte.
+  // Production ki settings pehle check karo
+  try {
+    runProductionChecks()
+  } catch (error) {
+    console.error(error.message)
+    process.exit(1)
+  }
+
+  // Phir database. Connect na ho toh server start hi nahi karte.
   try {
     await connectDB()
   } catch (error) {

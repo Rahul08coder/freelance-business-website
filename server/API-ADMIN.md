@@ -48,10 +48,12 @@ State-changing admin requests (POST, PATCH, DELETE) must send the header `X-CSRF
 
 - Errors:
   - 400 email or password missing, or not text
-  - 401 `Invalid email or password.` (same message for a wrong email and a wrong password)
+  - 401 `Invalid email or password.` (same message for a wrong email, a wrong password and a locked account)
   - 403 origin not allowed
   - 415 content type is not JSON
   - 429 too many failed attempts
+
+  - Account lock: 10 failed passwords within 15 minutes lock the account for 15 minutes. During the lock even the correct password is refused with the same 401 message.
 
 ## POST /api/admin/logout
 
